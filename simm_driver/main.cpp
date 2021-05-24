@@ -24,49 +24,53 @@ void RunTcpTest(const std::string &hostName, const std::string &filename = "")
     std::cout << "------------------- Client test for unsecured (no-TLS) Binary Pose Interface ---------------------\n";
     try
     {
-        pavo::pavo_driver *driver = new pavo::pavo_driver("192.168.0.11", 2368);
-        bool isRunning = driver->pavo_open(hostName, 2368);
-        if (!isRunning)
-        {
-            std::cout << "开启失败！\n";
-            return;
-        }
-        int port = 9090;
-        BinaryInterfaceDummyLaserData laserData(0.04);
-        BinaryInterfaceServer server(port);
-        isRunning = driver->is_lidar_connected();
-        driver->enable_motor(true);
-        driver->set_motor_speed(25);
-        driver->set_merge_coef(1);
         while (true)
         {
-            try
+            pavo::pavo_driver *driver = new pavo::pavo_driver("192.168.0.11", 2368);
+            bool isRunning = driver->pavo_open(hostName, 2368);
+            if (!isRunning)
             {
-                float coord[1400];
-                std::vector<pavo_response_scan_t> vec;
-                bool isOK = driver->get_scanned_data(vec, 0);
-                if (!isOK)
-                {
-                    std::cout << "获取数据失败！\n";
-                }
-                int i = 0;
-                std::cout << "size = " << vec.size() << std::endl;
-                for (pavo_response_scan_t pcd : vec)
-                {
-                    coord[i] = pcd.distance * 0.002;
-                    i++;
-                }
-                //调用服务器数据线程
-                auto sensor = laserData.getWaitConstantScan(coord);
-                server.write(&sensor, sizeof(sensor));
-                memset(coord, 0.0f, sizeof(coord));
+                std::cout << "开启失败！\n";
+                return;
             }
-            catch (std::exception &ex)
+            int port = 9090;
+            BinaryInterfaceDummyLaserData laserData(0.2);
+            BinaryInterfaceServer server(port);
+            isRunning = driver->is_lidar_connected();
+            driver->enable_motor(true);
+            driver->set_motor_speed(25);
+            driver->set_merge_coef(1);
+            while (true)
             {
-                std::cout << "get driver data error!\n";
+                try
+                {
+                    std::vector<pavo_response_scan_t> vec;
+                    bool isOK = driver->get_scanned_data(vec, 0);
+                    if (!isOK)
+                    {
+                        std::cout << "获取数据失败！\n";
+                    }
+                    int i = 0;
+                    std::cout << "size = " << vec.size() << std::endl;
+                    float* coord = new float[vec.size()];
+                    for (pavo_response_scan_t pcd : vec)
+                    {
+                        coord[i] = pcd.distance * 0.002;
+                        i++;
+                    }
+                    //调用服务器数据线程
+                    auto sensor = laserData.getWaitConstantScan(coord);
+                    server.write(&sensor, sizeof(sensor));
+                }
+                catch (std::exception &ex)
+                {
+                    std::cout << "connect break\n";
+                    driver->pavo_close();
+                    sleep(1);
+                    continue;
+                }
             }
         }
-        driver->pavo_close();
     }
     catch (std::exception &ex)
     {

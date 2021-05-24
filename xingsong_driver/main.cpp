@@ -50,7 +50,7 @@ void RunTcpTest(const std::string &hostName, const std::string &filename = "")
     std::cout << "------------------- Client test for unsecured (no-TLS) Binary Pose Interface ---------------------" << std::endl;
     try
     {
-        string server_address = "192.168.1.89";
+        string server_address = "192.168.1.88";
         int port = 8080;
         //1. 创建雷达驱动
         hins::ConnectionAddress laser_conn_info(server_address, port);
@@ -108,7 +108,7 @@ int main(int argc, char **argv)
     int c;
     bool server{true};
     bool usage{false};
-    std::string hostName{"192.168.1.11"};
+    std::string hostName{""};
     std::string outfile{""};
 
     /* =================================

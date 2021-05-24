@@ -38,8 +38,8 @@ public:
         double duration_scan{0.};                        //Overwrite this before send, set constant (see constructor of BinaryInterfaceDummyLaserData)
         double duration_rotate{0.};                      //Overwrite this before send, set constant (see constructor of BinaryInterfaceDummyLaserData)
         uint32_t numBeams{nBeams};                       //Constant
-        float angleStart{-M_PI * 0.5};             //Constant: laser opening angle is: -pi/2 to pi/2
-        float angleEnd{M_PI * 0.5};                //Constant: laser opening angle is: -pi/2 to pi/2
+        float angleStart{-M_PI * 135/180};             //Constant: laser opening angle is: -pi/2 to pi/2
+        float angleEnd{M_PI * 135/180};                //Constant: laser opening angle is: -pi/2 to pi/2
         float angleInc{M_PI / 180 * 360 / (nBeams - 1)}; //Constant: laser opening angle is: -pi/2 to pi/2
         float minRange{0.0};                             //Constant: no ranges smaller than 0
         float maxRange{0.};                              //Constant: no ranges bigger than 60
