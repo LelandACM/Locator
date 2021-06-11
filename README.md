@@ -11,3 +11,6 @@ https://github.com/GitACDreamer/sensor-driver/tree/master/simm_driver
 
 ### 4. 兴颂传感器
 https://github.com/GitACDreamer/sensor-driver/tree/master/xingsong_driver
+
+### 5. 北阳ROS驱动
+https://github.com/GitACDreamer/Locator/tree/master/ros_drivers
