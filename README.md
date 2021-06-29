@@ -14,3 +14,12 @@ https://github.com/GitACDreamer/sensor-driver/tree/master/xingsong_driver
 
 ### 5. 北阳ROS驱动
 https://github.com/GitACDreamer/Locator/tree/master/ros_drivers
+
+### 6. 倍加福ROS驱动
+https://github.com/GitACDreamer/Locator/tree/master/prf_ros_driver
+
+### 7. 博世官方Locator ROS驱动
+https://github.com/boschglobal/locator_ros_bridge
+
+### 8. 力士乐定位软件双雷达ROS驱动（请参考作者`iralabdisco`的开源工具）
+https://github.com/iralabdisco/ira_laser_tools
