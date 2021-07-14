@@ -23,3 +23,6 @@ https://github.com/boschglobal/locator_ros_bridge
 
 ### 8. 力士乐定位软件双雷达ROS驱动（请参考作者`iralabdisco`的开源工具）
 https://github.com/iralabdisco/ira_laser_tools
+
+### 9. 添加星秒ROS驱动
+https://github.com/GitACDreamer/Locator/tree/master/simm_ros_driver
