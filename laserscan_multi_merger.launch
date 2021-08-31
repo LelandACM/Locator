@@ -1,0 +1,66 @@
+<!--
+FROM: http://wiki.ros.org/tf#static_transform_publisher
+
+<<static_transform_publisher x y z yaw pitch roll frame_id child_frame_id period_in_ms>>
+Publish a static coordinate transform to tf using an x/y/z offset and yaw/pitch/roll. The period, in milliseconds, specifies how often to send a transform. 100ms (10hz) is a good value.
+== OR ==
+<<static_transform_publisher x y z qx qy qz qw frame_id child_frame_id  period_in_ms>>
+Publish a static coordinate transform to tf using an x/y/z offset and quaternion. The period, in milliseconds, specifies how often to send a transform. 100ms (10hz) is a good value.
+
+-->
+
+<!-- DEFINE HERE THE STATIC TRANFORMS, FROM BASE_FRAME (COMMON REFERENCE FRAME) TO THE VIRTUAL LASER FRAMES-->
+	<!-- WARNING: the virtual laser frame(s) *must* match the virtual laser name(s) listed in param: output_laser_scan -->
+<launch>
+<!-- 只需修改 laserscan_topic laserscan_topic2 frame_id frame_id2 -->
+<!--laser to point cloud-->
+<arg name="laserscan_topic"             default="/sick_safetyscanners/scan" /> <!-- 待变换的雷达topic -->
+<arg name="pointcloud_topic"           default="$(arg laserscan_topic)_cloud"/>
+<arg name="frame_id"           default="scan2"/><!-- 待变换的雷达topic坐标，需要与驱动内设置的相同，不然会报错 -->
+
+	<node pkg="laser2pc" name="laser2pc" type="laser2pc_node" output="screen">
+	<param name="laserscan_topic" value="$(arg laserscan_topic)"/>
+	<param name="pointcloud_topic" value="$(arg pointcloud_topic)"/>
+	<param name="frame_id" value="$(arg frame_id)" />	
+	</node>
+	
+<arg name="laserscan_topic2"             default="/sick_safetyscanners/scan2" /> <!-- 不作变换的雷达topic -->
+<arg name="pointcloud_topic2"           default="$(arg laserscan_topic2)_cloud"/>
+<arg name="frame_id2"           default="scan"/> <!-- 不作变换的雷达topic坐标，需要与驱动内设置的相同，不然会报错，合并结果在该坐标系内 -->
+<arg name="merged_frame_id" default="$(arg frame_id2)"/>		
+	<node pkg="laser2pc" name="laser2pc2" type="laser2pc_node" output="screen">
+	<param name="laserscan_topic" value="$(arg laserscan_topic2)"/>
+	<param name="pointcloud_topic" value="$(arg pointcloud_topic2)"/>
+	<param name="frame_id" value="$(arg frame_id2)" />	
+	</node>
+	
+	
+<!--laserscan_virtualizer-->
+	<node pkg="tf" type="static_transform_publisher" name="ira_static_broadcaster1" args="1 0 0 0 0 0 $(arg frame_id) $(arg merged_frame_id) 1000" /><!-- 设定tf -->
+	<node pkg="ira_laser_tools" name="laserscan_virtualizer" type="laserscan_virtualizer" output="screen">
+		<param name="cloud_topic" value="$(arg pointcloud_topic)"/>       <!-- INPUT POINT CLOUD -->
+		<param name="base_frame" value="$(arg frame_id)"/>     <!-- REFERENCE FRAME WHICH LASER(s) ARE RELATED-->
+		<param name="output_laser_topic" value ="$(arg laserscan_topic)_tf" />  <!-- VIRTUAL LASER OUTPUT TOPIC, LEAVE VALUE EMPTY TO PUBLISH ON THE VIRTUAL LASER NAMES (param: output_laser_scan) -->
+		<param name="virtual_laser_scan" value ="$(arg merged_frame_id)" /> <!-- LIST OF THE VIRTUAL LASER SCANS. YOU MUST PROVIDE THE STATIC TRANSFORMS TO TF, SEE ABOVE -->
+	</node>
+	
+	<node pkg="ira_laser_tools" name="laserscan_multi_merger" type="laserscan_multi_merger" output="screen">
+	<param name="destination_frame" value="$(arg merged_frame_id)"/>
+	<param name="cloud_destination_topic" value="/merged_cloud"/><!-- 输出的cloud topic -->
+	<param name="scan_destination_topic" value="/scan_multi"/><!-- 输出的scan topic -->
+	<param name="laserscan_topics" value ="$(arg laserscan_topic) $(arg laserscan_topic2)" /> <!-- LIST OF THE LASER SCAN TOPICS TO SUBSCRIBE -->
+	<param name="angle_min" value="-3.14"/>
+	<param name="angle_max" value="3.14"/>
+	<param name="angle_increment" value="0.0058"/>
+	<param name="scan_time" value="0.0333333"/>
+	<param name="range_min" value="0.30"/>
+	<param name="range_max" value="50.0"/>
+	
+	</node>
+	
+	<node name="laser2tcp_node" pkg="msg2tcp" type="laser2tcp_node" output="screen">
+        <param name="port" type="int" value="9090" />
+        <param name="laser_topic" type="string" value="/scan_multi" />
+        </node>
+	
+</launch>
