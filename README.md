@@ -26,3 +26,6 @@ https://github.com/iralabdisco/ira_laser_tools
 
 ### 9. 星秒ROS驱动
 https://github.com/GitACDreamer/Locator/tree/master/simm_ros_driver
+
+### 10. Locator api 1.4 版本
+https://github.com/GitACDreamer/Locator/tree/master/api_1.4
